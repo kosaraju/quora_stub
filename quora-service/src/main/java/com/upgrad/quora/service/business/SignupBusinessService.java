@@ -21,13 +21,12 @@ public class SignupBusinessService {
     public UserEntity signup(UserEntity userEntity) throws UserSignupException {
 
 
-        //Perform null check
-        if (userEntity == null || userEntity.getFirstName() == null ||
-                userEntity.getLastName() == null || userEntity.getEmail() == null
-                || userEntity.getPassword() == null || userEntity.getContactnumber() == null ||
-                userEntity.getFirstName().isEmpty() || userEntity.getLastName().isEmpty()
-                || userEntity.getEmail().isEmpty() || userEntity.getPassword().isEmpty() ||
-                userEntity.getContactnumber().isEmpty()) {
+        //Perform null check for mandatory fields
+        if (userEntity == null || userEntity.getFirstName() == null || userEntity.getLastName() == null ||
+                userEntity.getUsername()==null || userEntity.getEmail() == null || userEntity.getPassword() == null ||
+                userEntity.getFirstName().isEmpty() || userEntity.getLastName().isEmpty() ||
+                userEntity.getEmail().isEmpty() || userEntity.getPassword().isEmpty() || userEntity.getUsername().isEmpty()
+                ) {
             throw new UserSignupException("USE-001", "Blank or Malformed details provided for signup");
         }
 
