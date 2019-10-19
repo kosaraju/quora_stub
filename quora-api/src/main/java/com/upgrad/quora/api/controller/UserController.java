@@ -6,7 +6,7 @@ import com.upgrad.quora.api.model.SignoutResponse;
 import com.upgrad.quora.api.model.SignupUserRequest;
 import com.upgrad.quora.api.model.SignupUserResponse;
 import com.upgrad.quora.service.business.AuthenticationService;
-import com.upgrad.quora.service.business.SignupService;
+import com.upgrad.quora.service.business.UserService;
 import com.upgrad.quora.service.entity.UserAuthEntity;
 import com.upgrad.quora.service.entity.UserEntity;
 import com.upgrad.quora.service.exception.AuthenticationFailedException;
@@ -30,7 +30,7 @@ import java.util.UUID;
 public class UserController {
 
     @Autowired
-    private SignupService signupService;
+    private UserService userService;
 
     @Autowired
     private AuthenticationService authenticationService;
@@ -52,7 +52,7 @@ public class UserController {
         userEntity.setSalt("1234abc");
         userEntity.setRole("nonadmin");
 
-        final UserEntity createdUserEntity = signupService.signup(userEntity);
+        final UserEntity createdUserEntity = userService.signup(userEntity);
         SignupUserResponse userResponse = new SignupUserResponse().id(createdUserEntity.getUuid()).status("USER SUCCESSFULLY REGISTERED");
         return new ResponseEntity<SignupUserResponse>(userResponse, HttpStatus.CREATED);
     }

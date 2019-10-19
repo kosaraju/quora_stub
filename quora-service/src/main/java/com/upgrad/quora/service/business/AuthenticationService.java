@@ -5,6 +5,7 @@ import com.upgrad.quora.service.dao.UserDao;
 import com.upgrad.quora.service.entity.UserAuthEntity;
 import com.upgrad.quora.service.entity.UserEntity;
 import com.upgrad.quora.service.exception.AuthenticationFailedException;
+import com.upgrad.quora.service.exception.AuthorizationFailedException;
 import com.upgrad.quora.service.exception.SignOutRestrictedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,6 +43,7 @@ public class AuthenticationService {
 
             userAuthEntity.setLoginAt(now);
             userAuthEntity.setExpiresAt(expiresAt);
+            userAuthEntity.setLogoutAt(null);//case of relogin
 
             userDao.createAuthToken(userAuthEntity);
 
@@ -51,6 +53,7 @@ public class AuthenticationService {
             throw new AuthenticationFailedException("ATH-002", "Password failed");
         }
     }
+
     @Transactional(propagation = Propagation.REQUIRED)
     public UserAuthEntity logoff(final String acessToken) throws SignOutRestrictedException {
         UserAuthEntity userAuthEntity = userDao.getUserByToken(acessToken);
@@ -59,8 +62,20 @@ public class AuthenticationService {
         }
         userAuthEntity.setExpiresAt(ZonedDateTime.now());
         userAuthEntity.setLogoutAt(ZonedDateTime.now());
-        userAuthEntity.setAccessToken(null); // to ensure the session is invalidated!
+        //userAuthEntity.setAccessToken(null); // to ensure the session is invalidated!
         userDao.updateUserAuthEntity(userAuthEntity);
+        return userAuthEntity;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public UserAuthEntity validateBearerAuthentication(final String accessToken) throws AuthorizationFailedException {
+        UserAuthEntity userAuthEntity = userDao.getUserByToken(accessToken);
+        if (userAuthEntity == null) {
+            throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
+        }
+        if(userAuthEntity.getLogoutAt()!=null){
+            throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to get user details");
+        }
         return userAuthEntity;
     }
 
