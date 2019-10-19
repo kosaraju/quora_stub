@@ -20,16 +20,26 @@ public class SignupBusinessService {
     @Transactional(propagation = Propagation.REQUIRED)
     public UserEntity signup(UserEntity userEntity) throws UserSignupException {
 
-
         //Perform null check for mandatory fields
         if (userEntity == null || userEntity.getFirstName() == null || userEntity.getLastName() == null ||
                 userEntity.getUsername()==null || userEntity.getEmail() == null || userEntity.getPassword() == null ||
                 userEntity.getFirstName().isEmpty() || userEntity.getLastName().isEmpty() ||
                 userEntity.getEmail().isEmpty() || userEntity.getPassword().isEmpty() || userEntity.getUsername().isEmpty()
                 ) {
-            throw new UserSignupException("USE-001", "Blank or Malformed details provided for signup");
+            throw new UserSignupException("USE-001", "No input provided for required fields");
         }
 
+        //If user already exists with same username or email, throw respective exceptions
+        UserEntity existingUser1 = userDao.getUserByEmail(userEntity.getEmail());
+        UserEntity existingUser2 = userDao.getUserByUsername(userEntity.getUsername());
+
+        if(existingUser1!=null && existingUser2!=null){
+            throw new UserSignupException("SGR-003","Username & Email id already exists");
+        }else if(existingUser1!=null){
+            throw new UserSignupException("SGR-002","Email id already exists");
+        }else if(existingUser2!=null){
+            throw new UserSignupException("SGR-001","Username already exists");
+        }
 
         String[] encryptedText = passwordCryptographyProvider.encrypt(userEntity.getPassword());
         userEntity.setSalt(encryptedText[0]);
