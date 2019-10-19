@@ -2,14 +2,14 @@ package com.upgrad.quora.service.business;
 
 import com.upgrad.quora.service.dao.UserDao;
 import com.upgrad.quora.service.entity.UserEntity;
-import com.upgrad.quora.service.exception.UserSignupException;
+import com.upgrad.quora.service.exception.SignUpRestrictedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class SignupBusinessService {
+public class SignupService {
 
     @Autowired
     private UserDao userDao;
@@ -18,7 +18,7 @@ public class SignupBusinessService {
     private PasswordCryptographyProvider passwordCryptographyProvider;
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public UserEntity signup(UserEntity userEntity) throws UserSignupException {
+    public UserEntity signup(UserEntity userEntity) throws SignUpRestrictedException {
 
         //Perform null check for mandatory fields
         if (userEntity == null || userEntity.getFirstName() == null || userEntity.getLastName() == null ||
@@ -26,7 +26,7 @@ public class SignupBusinessService {
                 userEntity.getFirstName().isEmpty() || userEntity.getLastName().isEmpty() ||
                 userEntity.getEmail().isEmpty() || userEntity.getPassword().isEmpty() || userEntity.getUsername().isEmpty()
                 ) {
-            throw new UserSignupException("USE-001", "No input provided for required fields");
+            throw new SignUpRestrictedException("USE-001", "No input provided for required fields");
         }
 
         //If user already exists with same username or email, throw respective exceptions
@@ -34,11 +34,11 @@ public class SignupBusinessService {
         UserEntity existingUser2 = userDao.getUserByUsername(userEntity.getUsername());
 
         if(existingUser1!=null && existingUser2!=null){
-            throw new UserSignupException("SGR-003","Username & Email id already exists");
-        }else if(existingUser1!=null){
-            throw new UserSignupException("SGR-002","Email id already exists");
+            throw new SignUpRestrictedException("USE-002","Username & Email id already exists");
         }else if(existingUser2!=null){
-            throw new UserSignupException("SGR-001","Username already exists");
+            throw new SignUpRestrictedException("SGR-001","Try any other Username, this Username has already been taken");
+        }else if(existingUser1!=null){
+            throw new SignUpRestrictedException("SGR-002","This user has already been registered, try with any other emailId");
         }
 
         String[] encryptedText = passwordCryptographyProvider.encrypt(userEntity.getPassword());
