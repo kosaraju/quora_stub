@@ -57,12 +57,11 @@ public class AuthenticationService {
     @Transactional(propagation = Propagation.REQUIRED)
     public UserAuthEntity logoff(final String acessToken) throws SignOutRestrictedException {
         UserAuthEntity userAuthEntity = userDao.getUserByToken(acessToken);
-        if (userAuthEntity == null) {
+        if (userAuthEntity == null || ZonedDateTime.now().compareTo(userAuthEntity.getExpiresAt()) >= 0 ) {
             throw new SignOutRestrictedException("SGR-001", "User is not Signed in");
         }
         userAuthEntity.setExpiresAt(ZonedDateTime.now());
         userAuthEntity.setLogoutAt(ZonedDateTime.now());
-        //userAuthEntity.setAccessToken(null); // to ensure the session is invalidated!
         userDao.updateUserAuthEntity(userAuthEntity);
         return userAuthEntity;
     }
@@ -70,10 +69,14 @@ public class AuthenticationService {
     @Transactional(propagation = Propagation.REQUIRED)
     public UserAuthEntity validateBearerAuthentication(final String accessToken) throws AuthorizationFailedException {
         UserAuthEntity userAuthEntity = userDao.getUserByToken(accessToken);
-        if (userAuthEntity == null) {
+        if (userAuthEntity == null ) {
             throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
         }
-        if(userAuthEntity.getLogoutAt()!=null){
+        else if(ZonedDateTime.now().compareTo(userAuthEntity.getExpiresAt()) >= 0 ||
+                (userAuthEntity.getLogoutAt() !=null && ZonedDateTime.now().compareTo(userAuthEntity.getLogoutAt() ) >= 0)){
+            userAuthEntity.setExpiresAt(ZonedDateTime.now());
+            userAuthEntity.setLogoutAt(ZonedDateTime.now());
+            userDao.updateUserAuthEntity(userAuthEntity);
             throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to get user details");
         }
         return userAuthEntity;

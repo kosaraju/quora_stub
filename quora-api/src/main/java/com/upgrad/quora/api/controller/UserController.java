@@ -63,9 +63,11 @@ public class UserController {
         String[] tokens = authorization.split("Basic ");
 
         try{
-            decode = Base64.getDecoder().decode(tokens[0]);
+            decode = Base64.getDecoder().decode(tokens[1]);
         }catch(IllegalArgumentException ile){
             throw new AuthenticationFailedException("ATH-004","Unable to decode. Malformed authorization.");
+        }catch(IndexOutOfBoundsException ie){
+            throw new AuthenticationFailedException("ATH-005","Use format 'Basic (Base64decoded)Username:password'");
         }
         String decodedText = new String(decode);
         String[] decodedArray = decodedText.split(":");
@@ -81,9 +83,14 @@ public class UserController {
     }
 
     @RequestMapping(method = RequestMethod.POST, path = "/user/signout", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<SignoutResponse> logout(@RequestHeader("authorization") final String authorization) throws SignOutRestrictedException {
+    public ResponseEntity<SignoutResponse> logout(@RequestHeader("authorization") final String authorization) throws SignOutRestrictedException, AuthenticationFailedException {
         String[] tokens = authorization.split("Bearer ");
-        String jwtToken = tokens[0];
+        String jwtToken = null;
+        try{
+            jwtToken = tokens[1];
+        }catch(IndexOutOfBoundsException ie){
+            //throw new AuthenticationFailedException("ATH-005","Use format: 'Bearer JWTToken'");
+        }
 
         UserAuthEntity userAuthEntity = authenticationService.logoff(jwtToken);
 
