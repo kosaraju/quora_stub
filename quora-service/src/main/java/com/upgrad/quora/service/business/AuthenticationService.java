@@ -72,11 +72,7 @@ public class AuthenticationService {
         if (userAuthEntity == null ) {
             throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
         }
-        else if(ZonedDateTime.now().compareTo(userAuthEntity.getExpiresAt()) >= 0 ||
-                (userAuthEntity.getLogoutAt() !=null && ZonedDateTime.now().compareTo(userAuthEntity.getLogoutAt() ) >= 0)){
-            userAuthEntity.setExpiresAt(ZonedDateTime.now());
-            userAuthEntity.setLogoutAt(ZonedDateTime.now());
-            userDao.updateUserAuthEntity(userAuthEntity);
+        else if(userAuthEntity.getLogoutAt() !=null ){
             throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to get user details");
         }
         return userAuthEntity;
