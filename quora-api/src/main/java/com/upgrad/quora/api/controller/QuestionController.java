@@ -34,14 +34,7 @@ public class QuestionController {
     private QuestionService questionService;
     @RequestMapping(method = RequestMethod.POST, path = "/question/create", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<QuestionResponse> login(@RequestHeader("authorization") final String authorization, final QuestionRequest questionRequest) throws  AuthorizationFailedException{
-
-        String[] tokens = authorization.split("Bearer ");
-        String accessToken = null;
-        try{
-            accessToken = tokens[1];
-        }catch(IndexOutOfBoundsException ie){
-            //throw new AuthenticationFailedException("ATH-005","Use format: 'Bearer JWTToken'");
-        }
+    String accessToken = authenticationService.getBearerAccessToken(authorization);
         //Check if the bearer authentication exists
         UserAuthEntity userAuthEntity = authenticationService.checkAuthenticationforCreateQuestion(accessToken);
 
