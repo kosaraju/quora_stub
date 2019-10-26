@@ -28,16 +28,10 @@ public class AdminController {
     private AuthenticationService authenticationService;
 
     @RequestMapping(method = RequestMethod.DELETE, path = "/admin/user/{userId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<UserDeleteResponse> userDelete(@PathVariable("userId") final String userId, @RequestHeader("authorization") final String authorization) throws UserNotFoundException, AuthorizationFailedException {
+    public ResponseEntity<UserDeleteResponse> userDelete(@PathVariable("userId") final String userId, @RequestHeader("authorization") final String authorization) throws UserNotFoundException, AuthorizationFailedException, AuthenticationFailedException {
 
-        String[] tokens = authorization.split("Bearer ");
-        String accessToken = null;
-        try{
-            accessToken = tokens[1];
-        }catch(IndexOutOfBoundsException ie){
-            //throw new AuthenticationFailedException("ATH-005","Use format: 'Bearer JWTToken'");
-            //Commented to pass the test cases as it is not handeled in test cases
-        }
+        String accessToken = authenticationService.getBearerAccessToken(authorization);
+
         //Check if the bearer authentication exists
         UserAuthEntity userAuthEntity = authenticationService.validateBearerAuthentication(accessToken);
         if (userAuthEntity.getUser().getRole()==null || !userAuthEntity.getUser().getRole().equalsIgnoreCase("admin")){
