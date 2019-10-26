@@ -33,7 +33,7 @@ public class AdminController {
         String accessToken = authenticationService.getBearerAccessToken(authorization);
 
         //Check if the bearer authentication exists
-        UserAuthEntity userAuthEntity = authenticationService.validateBearerAuthentication(accessToken);
+        UserAuthEntity userAuthEntity = authenticationService.validateBearerAuthentication(accessToken, "to get user details");
 
         //Check if user exists & delete
         UserEntity userEntity = userService.deleteUser(userId, userAuthEntity);
