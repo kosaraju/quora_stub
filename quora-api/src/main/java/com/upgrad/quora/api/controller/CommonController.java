@@ -28,7 +28,7 @@ public class CommonController {
     public ResponseEntity<UserDetailsResponse> login(@PathVariable("userId") final String userId, @RequestHeader("authorization") final String authorization) throws UserNotFoundException, AuthorizationFailedException, AuthenticationFailedException {
         String accessToken = authenticationService.getBearerAccessToken(authorization);
         //Check if the bearer authentication exists
-        authenticationService.validateBearerAuthentication(accessToken);
+        authenticationService.validateBearerAuthentication(accessToken, "to get user details");
 
         // search userByUuid
         UserEntity userEntity = userService.getUserProfile(userId);
