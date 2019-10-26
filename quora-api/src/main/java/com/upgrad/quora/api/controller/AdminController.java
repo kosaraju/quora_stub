@@ -34,12 +34,9 @@ public class AdminController {
 
         //Check if the bearer authentication exists
         UserAuthEntity userAuthEntity = authenticationService.validateBearerAuthentication(accessToken);
-        if (userAuthEntity.getUser().getRole()==null || !userAuthEntity.getUser().getRole().equalsIgnoreCase("admin")){
-            throw new AuthorizationFailedException("ATHR-003","Unauthorized Access, Entered user is not an admin");
-        }
 
         //Check if user exists & delete
-        UserEntity userEntity = userService.deleteUser(userId);
+        UserEntity userEntity = userService.deleteUser(userId, userAuthEntity);
 
         UserDeleteResponse userDeleteResponse = new UserDeleteResponse().id(userEntity.getUuid()).status("USER SUCCESSFULLY DELETED");
         return new ResponseEntity<UserDeleteResponse>(userDeleteResponse, HttpStatus.OK);
