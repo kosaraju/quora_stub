@@ -26,6 +26,7 @@ public class CommonController {
 
     @RequestMapping(method = RequestMethod.GET, path = "/userprofile/{userId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<UserDetailsResponse> userProfile(@PathVariable("userId") final String userId, @RequestHeader("authorization") final String authorization) throws UserNotFoundException, AuthorizationFailedException, AuthenticationFailedException {
+
         String accessToken = authenticationService.getBearerAccessToken(authorization);
 
         //Check if the bearer authentication exists
