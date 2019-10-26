@@ -67,25 +67,13 @@ public class AuthenticationService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public UserAuthEntity validateBearerAuthentication(final String accessToken, final String context) throws AuthorizationFailedException {
+    public UserAuthEntity validateBearerAuthentication(final String accessToken) throws AuthorizationFailedException {
         UserAuthEntity userAuthEntity = userDao.getUserByToken(accessToken);
         if (userAuthEntity == null ) {
             throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
         }
         else if(userAuthEntity.getLogoutAt() !=null ){
-            throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first " + context);
-        }
-        return userAuthEntity;
-    }
-    
-       @Transactional(propagation = Propagation.REQUIRED)
-       public UserAuthEntity checkAuthenticationforCreateQuestion(final String accessToken) throws AuthorizationFailedException {
-        UserAuthEntity userAuthEntity = userDao.getUserByToken(accessToken);
-        if (userAuthEntity == null ) {
-            throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
-        }
-        else if(userAuthEntity.getLogoutAt() !=null ){
-            throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to post a question");
+            throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to get user details");
         }
         return userAuthEntity;
     }
@@ -98,13 +86,23 @@ public class AuthenticationService {
         }catch(IndexOutOfBoundsException ie){
             accessToken = tokens[0]; //for scenarios where those users don't adhere to adding prefix of Bearer like test cases
             if (accessToken==null){
-                throw new AuthenticationFailedException("ATH-005","Use format: 'Bearer accessToken'");
+                throw new AuthenticationFailedException("ATH-005","Use format: 'Bearer JWTToken'");
             }
         }
 
         return accessToken;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
+    public UserAuthEntity checkAuthenticationforCreateQuestion(final String accessToken) throws AuthorizationFailedException {
+        UserAuthEntity userAuthEntity = userDao.getUserByToken(accessToken);
+        if (userAuthEntity == null ) {
+            throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
+        }
+        else if(userAuthEntity.getLogoutAt() !=null ){
+            throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to post a question");
+        }
+        return userAuthEntity;
+    }
+
 }
-
-
