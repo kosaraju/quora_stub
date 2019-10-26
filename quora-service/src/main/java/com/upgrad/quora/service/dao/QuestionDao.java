@@ -43,6 +43,15 @@ public class QuestionDao {
         }
     }
 
+    public QuestionEntity getQuestionByContent(final String content) {
+        try {
+            return entityManager.createNamedQuery("QuestionEntityByContent", QuestionEntity.class).setParameter("content", content).getSingleResult();
+        } catch (NoResultException nre) {
+            return null;
+        }
+    }
+
+
     public QuestionEntity updateQuestion(final QuestionEntity questionEntity) {
         return entityManager.merge(questionEntity);
     }

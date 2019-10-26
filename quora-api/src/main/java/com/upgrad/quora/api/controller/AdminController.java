@@ -25,17 +25,22 @@ public class AdminController {
     @Autowired
     private AuthenticationService authenticationService;
 
+    /*
+    Handler for admin to delete a user
+     */
     @RequestMapping(method = RequestMethod.DELETE, path = "/admin/user/{userId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<UserDeleteResponse> userDelete(@PathVariable("userId") final String userId, @RequestHeader("authorization") final String authorization) throws UserNotFoundException, AuthorizationFailedException, AuthenticationFailedException {
 
+        //Split the accesstoken to get jwtToken
         String accessToken = authenticationService.getBearerAccessToken(authorization);
 
-        //Check if the bearer authentication exists
+        //Validate the bearer authentication providing context as "to get user details"
         UserAuthEntity userAuthEntity = authenticationService.validateBearerAuthentication(accessToken, "to get user details");
 
-        //Check if user exists & delete
+        //Invoke User Service to check if user exists & delete. Delete only if authenticated user is an admin. Don't allow to delete self.
         UserEntity userEntity = userService.deleteUser(userId, userAuthEntity);
 
+        //Return the ResponseEntity accordingly after successfully deleting the same
         UserDeleteResponse userDeleteResponse = new UserDeleteResponse().id(userEntity.getUuid()).status("USER SUCCESSFULLY DELETED");
         return new ResponseEntity<UserDeleteResponse>(userDeleteResponse, HttpStatus.OK);
     }

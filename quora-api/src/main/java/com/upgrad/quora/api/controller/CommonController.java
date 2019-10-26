@@ -24,16 +24,22 @@ public class CommonController {
     @Autowired
     private UserService userService;
 
+    /*
+    Handler to fetch any user profile details for any valid authentic request
+     */
     @RequestMapping(method = RequestMethod.GET, path = "/userprofile/{userId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<UserDetailsResponse> userProfile(@PathVariable("userId") final String userId, @RequestHeader("authorization") final String authorization) throws UserNotFoundException, AuthorizationFailedException, AuthenticationFailedException {
+
+        //Get the accessToken from RequestHeader by splitting it appropriately
         String accessToken = authenticationService.getBearerAccessToken(authorization);
-        //Check if the bearer authentication exists
+
+        //Validate the bearer authentication providing context as "to get user details"
         authenticationService.validateBearerAuthentication(accessToken, "to get user details");
 
-        // search userByUuid
+        //Invoke business service to search for the user in the database, throw UserNotFoundException if no user is found
         UserEntity userEntity = userService.getUserProfile(userId);
 
-
+        //If user found, fill ResponseEntity and return userDetailsResponse
         UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
         userDetailsResponse.setUserName(userEntity.getUsername());
         userDetailsResponse.setAboutMe(userEntity.getAboutme());
