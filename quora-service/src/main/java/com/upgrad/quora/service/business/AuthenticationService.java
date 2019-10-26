@@ -78,6 +78,21 @@ public class AuthenticationService {
         return userAuthEntity;
     }
 
+    public String getBearerAccessToken(final String authorization) throws AuthenticationFailedException{
+        String[] tokens = authorization.split("Bearer ");
+        String accessToken = null;
+        try{
+            accessToken = tokens[1];
+        }catch(IndexOutOfBoundsException ie){
+            accessToken = tokens[0]; //for scenarios where those users don't adhere to adding prefix of Bearer like test cases
+            if (accessToken==null){
+                throw new AuthenticationFailedException("ATH-005","Use format: 'Bearer JWTToken'");
+            }
+        }
+
+        return accessToken;
+    }
+
 }
 
 

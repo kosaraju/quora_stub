@@ -26,13 +26,9 @@ public class CommonController {
 
     @RequestMapping(method = RequestMethod.GET, path = "/userprofile/{userId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<UserDetailsResponse> login(@PathVariable("userId") final String userId, @RequestHeader("authorization") final String authorization) throws UserNotFoundException, AuthorizationFailedException, AuthenticationFailedException {
-        String[] tokens = authorization.split("Bearer ");
-        String accessToken = null;
-        try{
-            accessToken = tokens[1];
-        }catch(IndexOutOfBoundsException ie){
-            //throw new AuthenticationFailedException("ATH-005","Use format: 'Bearer JWTToken'");
-        }
+
+        String accessToken = authenticationService.getBearerAccessToken(authorization);
+
         //Check if the bearer authentication exists
         authenticationService.validateBearerAuthentication(accessToken);
 
