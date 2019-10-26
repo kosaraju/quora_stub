@@ -58,5 +58,11 @@ public class UserService {
         return userEntity;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
+    public UserEntity deleteUser(String uuid) throws UserNotFoundException {
+        UserEntity userEntity = getUserProfile(uuid);
+        userDao.deleteUser(userEntity);
+        return userEntity;
+    }
 
     }

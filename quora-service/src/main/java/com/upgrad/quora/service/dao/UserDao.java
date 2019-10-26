@@ -2,6 +2,8 @@ package com.upgrad.quora.service.dao;
 
 import com.upgrad.quora.service.entity.UserAuthEntity;
 import com.upgrad.quora.service.entity.UserEntity;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -17,6 +19,12 @@ public class UserDao {
 
     public UserEntity createUser(UserEntity userEntity) {
         entityManager.persist(userEntity);
+        return userEntity;
+    }
+
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    public UserEntity deleteUser(UserEntity userEntity) {
+        entityManager.remove(userEntity);
         return userEntity;
     }
 
