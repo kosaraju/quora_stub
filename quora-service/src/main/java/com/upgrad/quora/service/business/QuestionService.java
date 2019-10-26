@@ -25,5 +25,20 @@ public class QuestionService {
     public QuestionEntity createQuestion(QuestionEntity questionEntity) {
         return questionDao.createQuestion(questionEntity);
     }
+    
+    @Transactional(propagation = Propagation.REQUIRED)
+    public QuestionEntity editQuestion(String content, long userId, String questionUUID) throws AuthorizationFailedException, InvalidQuestionException{
+        QuestionEntity questionEntity = questionDao.getQuestion(questionUUID);
+        if(questionEntity == null)
+        {
+            throw new InvalidQuestionException("QUES-001", "Entered question uuid does not exist");
+        }
+        if(userId != questionEntity.getUser().getId())
+        {
+            throw new AuthorizationFailedException("ATHR-003", "Only the question owner can edit the question");
+        }
+        questionEntity.setContent(content);
+        return questionDao.getQuestion(questionUUID);
+    }
 
 }
