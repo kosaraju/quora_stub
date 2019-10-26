@@ -1,7 +1,9 @@
 package com.upgrad.quora.service.business;
 
 import com.upgrad.quora.service.dao.UserDao;
+import com.upgrad.quora.service.entity.UserAuthEntity;
 import com.upgrad.quora.service.entity.UserEntity;
+import com.upgrad.quora.service.exception.AuthorizationFailedException;
 import com.upgrad.quora.service.exception.SignUpRestrictedException;
 import com.upgrad.quora.service.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,5 +60,18 @@ public class UserService {
         return userEntity;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
+    public UserEntity deleteUser(String uuid, UserAuthEntity userAuthEntity) throws UserNotFoundException, AuthorizationFailedException {
+
+        if (userAuthEntity.getUser().getRole()==null || !userAuthEntity.getUser().getRole().equalsIgnoreCase("admin")){
+            throw new AuthorizationFailedException("ATHR-003","Unauthorized Access, Entered user is not an admin");
+        }else if(userAuthEntity.getUser().getUuid().equalsIgnoreCase(uuid)){
+            throw new AuthorizationFailedException("ATH-006","Not allowed to delete yourself");
+        }
+
+        UserEntity userEntity = getUserProfile(uuid);
+        userDao.deleteUser(userEntity);
+        return userEntity;
+    }
 
     }
