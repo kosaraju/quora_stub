@@ -84,13 +84,7 @@ public class UserController {
 
     @RequestMapping(method = RequestMethod.POST, path = "/user/signout", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SignoutResponse> logout(@RequestHeader("authorization") final String authorization) throws SignOutRestrictedException, AuthenticationFailedException {
-        String[] tokens = authorization.split("Bearer ");
-        String jwtToken = null;
-        try{
-            jwtToken = tokens[1];
-        }catch(IndexOutOfBoundsException ie){
-            //throw new AuthenticationFailedException("ATH-005","Use format: 'Bearer JWTToken'");
-        }
+    String accessToken = authenticationService.getBearerAccessToken(authorization);
 
         UserAuthEntity userAuthEntity = authenticationService.logoff(jwtToken);
 
