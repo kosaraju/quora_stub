@@ -50,5 +50,19 @@ public class QuestionController {
         QuestionResponse questionResponse = new QuestionResponse().id(questionEntity.getUuid()).status("QUESTION CREATED");
         return new ResponseEntity<QuestionResponse>(questionResponse,HttpStatus.OK);
     }
+    
+        //PUT Request
+    @RequestMapping(method = RequestMethod.PUT, path = "/question/edit/{questionId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<QuestionEditResponse> login(@RequestHeader("authorization") final String authorization, @PathVariable("questionId") final String questionId, final QuestionEditRequest questionEditRequest) throws AuthorizationFailedException, InvalidQuestionException,AuthenticationFailedException {
+
+        String accessToken = authenticationService.getBearerAccessToken(authorization);
+        //Check if the bearer authentication exists
+        UserAuthEntity userAuthEntity = authenticationService.checkAuthenticationEditQuestion(accessToken);
+        UserEntity user = userAuthEntity.getUser();
+        // Edit question
+        QuestionEntity questionEntity = questionService.editQuestion(questionEditRequest.getContent(), user.getId(),  questionId);
+        QuestionEditResponse questionEditResponse = new QuestionEditResponse().id(questionEntity.getUuid()).status("QUESTION EDITED");
+        return new ResponseEntity<QuestionEditResponse>(questionEditResponse,HttpStatus.OK);
+    }
 }
 
