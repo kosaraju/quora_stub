@@ -72,18 +72,29 @@ public class AuthenticationService {
         if (userAuthEntity == null ) {
             throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
         }
-        else if(ZonedDateTime.now().compareTo(userAuthEntity.getExpiresAt()) >= 0 ||
-                (userAuthEntity.getLogoutAt() !=null && ZonedDateTime.now().compareTo(userAuthEntity.getLogoutAt() ) >= 0)){
-            userAuthEntity.setExpiresAt(ZonedDateTime.now());
-            userAuthEntity.setLogoutAt(ZonedDateTime.now());
-            userDao.updateUserAuthEntity(userAuthEntity);
+        else if(userAuthEntity.getLogoutAt() !=null ){
             throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to get user details");
         }
         return userAuthEntity;
     }
-    
-       @Transactional(propagation = Propagation.REQUIRED)
-       public UserAuthEntity checkAuthenticationforCreateQuestion(final String accessToken) throws AuthorizationFailedException {
+
+    public String getBearerAccessToken(final String authorization) throws AuthenticationFailedException{
+        String[] tokens = authorization.split("Bearer ");
+        String accessToken = null;
+        try{
+            accessToken = tokens[1];
+        }catch(IndexOutOfBoundsException ie){
+            accessToken = tokens[0]; //for scenarios where those users don't adhere to adding prefix of Bearer like test cases
+            if (accessToken==null){
+                throw new AuthenticationFailedException("ATH-005","Use format: 'Bearer JWTToken'");
+            }
+        }
+
+        return accessToken;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public UserAuthEntity checkAuthenticationforCreateQuestion(final String accessToken) throws AuthorizationFailedException {
         UserAuthEntity userAuthEntity = userDao.getUserByToken(accessToken);
         if (userAuthEntity == null ) {
             throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
@@ -95,5 +106,3 @@ public class AuthenticationService {
     }
 
 }
-
-
