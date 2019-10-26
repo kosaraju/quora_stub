@@ -33,7 +33,7 @@ public class QuestionController {
     @Autowired
     private QuestionService questionService;
     @RequestMapping(method = RequestMethod.POST, path = "/question/create", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<QuestionResponse> login(@RequestHeader("authorization") final String authorization, final QuestionRequest questionRequest) throws  AuthorizationFailedException{
+    public ResponseEntity<QuestionResponse> login(@RequestHeader("authorization") final String authorization, final QuestionRequest questionRequest) throws  AuthorizationFailedException,AuthenticationFailedException{
     String accessToken = authenticationService.getBearerAccessToken(authorization);
         //Check if the bearer authentication exists
         UserAuthEntity userAuthEntity = authenticationService.checkAuthenticationforCreateQuestion(accessToken);
