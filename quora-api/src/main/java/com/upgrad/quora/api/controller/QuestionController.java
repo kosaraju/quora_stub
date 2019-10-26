@@ -33,7 +33,7 @@ public class QuestionController {
     public ResponseEntity<QuestionResponse> postQuestion(@RequestHeader("authorization") final String authorization, final QuestionRequest questionRequest) throws  AuthorizationFailedException,AuthenticationFailedException{
     String accessToken = authenticationService.getBearerAccessToken(authorization);
         //Check if the bearer authentication exists
-        UserAuthEntity userAuthEntity = authenticationService.validateBearerAuthentication(accessToken, "to post question");
+        UserAuthEntity userAuthEntity = authenticationService.validateBearerAuthentication(accessToken, "to post a question");
 
         UserEntity user = userAuthEntity.getUser();
         QuestionEntity questionEntity = new QuestionEntity();
@@ -54,7 +54,7 @@ public class QuestionController {
 
         String accessToken = authenticationService.getBearerAccessToken(authorization);
         //Check if the bearer authentication exists
-        UserAuthEntity userAuthEntity = authenticationService.validateBearerAuthentication(accessToken, "to edit Question");
+        UserAuthEntity userAuthEntity = authenticationService.validateBearerAuthentication(accessToken, "to edit the question");
         UserEntity user = userAuthEntity.getUser();
         // Edit question
         QuestionEntity questionEntity = questionService.editQuestion(questionEditRequest.getContent(), user.getId(),  questionId);
