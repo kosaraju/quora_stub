@@ -1,9 +1,6 @@
 package com.upgrad.quora.api.controller;
 
-import com.upgrad.quora.api.model.QuestionEditRequest;
-import com.upgrad.quora.api.model.QuestionEditResponse;
-import com.upgrad.quora.api.model.QuestionRequest;
-import com.upgrad.quora.api.model.QuestionResponse;
+import com.upgrad.quora.api.model.*;
 import com.upgrad.quora.service.business.AuthenticationService;
 import com.upgrad.quora.service.business.QuestionService;
 import com.upgrad.quora.service.entity.QuestionEntity;
@@ -19,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -73,6 +72,31 @@ public class QuestionController {
         QuestionEntity questionEntity = questionService.editQuestion(questionEditRequest.getContent(), user.getId(),  questionId);
         QuestionEditResponse questionEditResponse = new QuestionEditResponse().id(questionEntity.getUuid()).status("QUESTION EDITED");
         return new ResponseEntity<QuestionEditResponse>(questionEditResponse,HttpStatus.OK);
+    }
+
+    /*
+    Handler to get all the questions
+    */
+    @RequestMapping(method = RequestMethod.GET, path = "/question/all", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<List<QuestionDetailsResponse>> getAllQuestions(@RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, AuthenticationFailedException {
+
+        //Get bearer access token
+        String accessToken = authenticationService.getBearerAccessToken(authorization);
+
+        //Validate bearer authentication token
+        UserAuthEntity userAuthEntity = authenticationService.validateBearerAuthentication(accessToken, "to get all questions");
+
+        //Invoke business Service to get all the questions and add them to a collection and send across in ResponseEntity
+        List<QuestionEntity> questionEntityList = questionService.getAllQuestions();
+        List<QuestionDetailsResponse> entities = new ArrayList<QuestionDetailsResponse>();
+        for (QuestionEntity n : questionEntityList) {
+            QuestionDetailsResponse questionDetailsResponse = new QuestionDetailsResponse();
+            questionDetailsResponse.id(n.getUuid());
+            questionDetailsResponse.content(n.getContent());
+            entities.add(questionDetailsResponse);
+        }
+
+        return new ResponseEntity<List<QuestionDetailsResponse>>(entities, HttpStatus.OK);
     }
 }
 
