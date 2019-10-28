@@ -22,13 +22,14 @@ public class QuestionService {
     @Transactional(propagation = Propagation.REQUIRED)
     public QuestionEntity createQuestion(QuestionEntity questionEntity) throws InvalidQuestionException {
         String content = questionEntity.getContent();
+        if (content == null || content.isEmpty() || content.trim().isEmpty()) {
+            throw new InvalidQuestionException("QUE-888", "Content can't be null or empty");
+        }
+
         if (questionDao.getQuestionByContent(content.trim()) != null) {
             throw new InvalidQuestionException("QUE-999", "Question already exists. Duplicate question not allowed");
         }
 
-        if (content == null || content.isEmpty() || content.trim().isEmpty()) {
-            throw new InvalidQuestionException("QUE-888", "Content can't be null or empty");
-        }
         return questionDao.createQuestion(questionEntity);
     }
     
