@@ -78,16 +78,15 @@ public class QuestionController {
     Handler to get all the questions
     */
     @RequestMapping(method = RequestMethod.GET, path = "/question/all", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<List<QuestionDetailsResponse>> allQuestions(@RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, AuthenticationFailedException {
+    public ResponseEntity<List<QuestionDetailsResponse>> getAllQuestions(@RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, AuthenticationFailedException {
 
         //Get bearer access token
         String accessToken = authenticationService.getBearerAccessToken(authorization);
 
         //Validate bearer authentication token
-        UserAuthEntity userAuthEntity = authenticationService.validateBearerAuthentication(accessToken, "to edit the question");
-        UserEntity user = userAuthEntity.getUser();
+        UserAuthEntity userAuthEntity = authenticationService.validateBearerAuthentication(accessToken, "to get all questions");
 
-        //Invoke business Service to edit the question
+        //Invoke business Service to get all the questions and add them to a collection and send across in ResponseEntity
         List<QuestionEntity> questionEntityList = questionService.getAllQuestions();
         List<QuestionDetailsResponse> entities = new ArrayList<QuestionDetailsResponse>();
         for (QuestionEntity n : questionEntityList) {
