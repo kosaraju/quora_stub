@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class QuestionService {
     @Autowired
@@ -45,6 +47,11 @@ public class QuestionService {
         questionEntity.setContent(content);
         questionDao.updateQuestion(questionEntity);
         return questionDao.getQuestion(questionUUID);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public List<QuestionEntity> getAllQuestions() {
+        return questionDao.findAll();
     }
 
 }
