@@ -1,5 +1,9 @@
 #Ignore folder named .idea
 .idea/
+quora-api/target/
+quora-service/target/
+quora-db/target/
+
 
 #Ignore all .iml files
 *.iml
