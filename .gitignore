@@ -1,6 +1,13 @@
+#Ignore folder named .idea
 .idea/
+
+#Ignore all .iml files
+*.iml
+
+#Ignore folder
 quora-api/target
 quora-db/target
 quora-service/target
-*.iml
+
+#Ignore file 
 .idea/compiler.xml
