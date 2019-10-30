@@ -41,6 +41,7 @@ public class AnswerService {
             );
         }
 
+        answerEntity.setAns(content);
         return answerDao.updateAnswer(answerEntity);
     }
 }
