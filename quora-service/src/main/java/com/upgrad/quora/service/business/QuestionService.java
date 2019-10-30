@@ -32,7 +32,7 @@ public class QuestionService {
 
         return questionDao.createQuestion(questionEntity);
     }
-    
+
     @Transactional(propagation = Propagation.REQUIRED)
     public QuestionEntity editQuestion(String content, long userId, String questionUUID) throws AuthorizationFailedException, InvalidQuestionException{
         QuestionEntity questionEntity = questionDao.getQuestion(questionUUID);
@@ -53,6 +53,15 @@ public class QuestionService {
     @Transactional(propagation = Propagation.REQUIRED)
     public List<QuestionEntity> getAllQuestions() {
         return questionDao.findAll();
+    }
+
+    public QuestionEntity getQuestionById(String questionUUID) throws InvalidQuestionException {
+        QuestionEntity questionEntity = questionDao.getQuestion(questionUUID);
+        if(questionEntity == null)
+        {
+            throw new InvalidQuestionException("QUES-001", "The question entered is invalid");
+        }
+        return questionEntity;
     }
 
 }
