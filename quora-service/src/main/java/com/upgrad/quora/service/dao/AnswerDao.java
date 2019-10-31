@@ -56,7 +56,7 @@ public class AnswerDao {
                         "AnswerEntityByQuestionEntity",
                         AnswerEntity.class)
                 .setParameter(
-                        "AnswerEntityByQuestionEntity",
+                        "questionEntity",
                         questionEntity)
                 .getResultList();
     }
