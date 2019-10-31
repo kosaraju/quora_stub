@@ -1,12 +1,14 @@
 package com.upgrad.quora.service.dao;
 
 import com.upgrad.quora.service.entity.AnswerEntity;
+import com.upgrad.quora.service.entity.QuestionEntity;
 import com.upgrad.quora.service.entity.UserAuthEntity;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import java.util.List;
 
 @SuppressWarnings("JpaQueryApiInspection")
 @Repository
@@ -46,5 +48,16 @@ public class AnswerDao {
 
     public AnswerEntity updateAnswer(final AnswerEntity answerEntity) {
         return entityManager.merge(answerEntity);
+    }
+
+    public List<AnswerEntity> AnswerEntityByQuestionEntity(final QuestionEntity questionEntity){
+        return entityManager
+                .createNamedQuery(
+                        "AnswerEntityByQuestionEntity",
+                        AnswerEntity.class)
+                .setParameter(
+                        "AnswerEntityByQuestionEntity",
+                        questionEntity)
+                .getResultList();
     }
 }
