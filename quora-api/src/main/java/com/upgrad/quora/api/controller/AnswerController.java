@@ -1,9 +1,6 @@
 package com.upgrad.quora.api.controller;
 
-import com.upgrad.quora.api.model.AnswerEditRequest;
-import com.upgrad.quora.api.model.AnswerEditResponse;
-import com.upgrad.quora.api.model.AnswerRequest;
-import com.upgrad.quora.api.model.AnswerResponse;
+import com.upgrad.quora.api.model.*;
 import com.upgrad.quora.service.business.AnswerService;
 import com.upgrad.quora.service.business.AuthenticationService;
 import com.upgrad.quora.service.business.QuestionService;
@@ -22,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -98,5 +97,33 @@ public class AnswerController {
         return new ResponseEntity<AnswerEditResponse>(answerEditResponse,HttpStatus.OK);
     }
 
+
+    /*
+    Get Request
+    */
+    @RequestMapping(method = RequestMethod.GET, path = "answer/all/{questionId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<List<AnswerDetailsResponse>> getAllAnswersForQuestion(
+            @RequestHeader("authorization") final String authorization,
+            @PathVariable("questionId") final String questionId
+    ) throws AuthorizationFailedException, AuthenticationFailedException, InvalidQuestionException {
+
+        //Get bearer access token
+        String accessToken = authenticationService.getBearerAccessToken(authorization);
+
+        //Validate bearer authentication token
+        UserAuthEntity userAuthEntity = authenticationService.validateBearerAuthentication(accessToken, "to get all answers for the question");
+        QuestionEntity questionEntity = answerService.getQuestionById(questionId);
+
+        List<AnswerEntity> answerEntityList = answerService.getAllAnswersToQuestion(questionEntity);
+        List<AnswerDetailsResponse> answerDetailsResponsesList = new ArrayList<>();
+        for (AnswerEntity answerEntity : answerEntityList) {
+            AnswerDetailsResponse answerDetailsResponse = new AnswerDetailsResponse();
+            answerDetailsResponse.setId(answerEntity.getUuid());
+            answerDetailsResponse.setAnswerContent(answerEntity.getAns());
+            answerDetailsResponse.setQuestionContent(answerEntity.getQuestionEntity().getContent());
+            answerDetailsResponsesList.add(answerDetailsResponse);
+        }
+        return new ResponseEntity<List<AnswerDetailsResponse>>(answerDetailsResponsesList, HttpStatus.OK);
+    }
 }
 
