@@ -125,5 +125,15 @@ public class AnswerController {
         }
         return new ResponseEntity<List<AnswerDetailsResponse>>(answerDetailsResponsesList, HttpStatus.OK);
     }
+
+    @RequestMapping(method = RequestMethod.DELETE, path = "answer/delete/{answerId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<AnswerDeleteResponse> deleteAnswer(@RequestHeader("authorization") final String authorization, @PathVariable("answerId") final String answerId) throws AuthenticationFailedException, AuthorizationFailedException, AnswerNotFoundException {
+        String accessToken = authenticationService.getBearerAccessToken(authorization);
+        UserAuthEntity userAuthEntity = authenticationService.validateBearerAuthentication(accessToken, "to delete the answer");
+        UserEntity user = userAuthEntity.getUser();
+        AnswerEntity answerEntity = answerService.deleteAnswer(user.getUuid(), answerId);
+        AnswerDeleteResponse answerDeleteResponse = new AnswerDeleteResponse().id(answerEntity.getUuid()).status("ANSWER DELETED");
+        return new ResponseEntity<AnswerDeleteResponse>(answerDeleteResponse, HttpStatus.OK);
+    }
 }
 

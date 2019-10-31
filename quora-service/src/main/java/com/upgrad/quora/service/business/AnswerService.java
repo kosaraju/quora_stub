@@ -69,4 +69,17 @@ public class AnswerService {
         return answerEntitieList;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
+    public AnswerEntity deleteAnswer(String userId, String answerUUID) throws AnswerNotFoundException, AuthorizationFailedException {
+        AnswerEntity answerEntity = answerDao.getAnswer(answerUUID);
+        if (answerEntity == null) {
+            throw new AnswerNotFoundException("ANS-001", "Entered answer uuid does not exist");
+        }
+        if (!userId.equals(answerEntity.getUserEntity().getUuid()) && !answerEntity.getUserEntity().getRole().equalsIgnoreCase("admin")) {
+            throw new AuthorizationFailedException("ATHR-003", "Only the answer owner or admin can delete the answer");
+        }
+
+        return answerDao.deleteAnswer(answerEntity);
+    }
+
 }
