@@ -47,4 +47,8 @@ public class AnswerDao {
     public AnswerEntity updateAnswer(final AnswerEntity answerEntity) {
         return entityManager.merge(answerEntity);
     }
+
+    public void deleteAnswer(final AnswerEntity answerEntity){
+        entityManager.remove(answerEntity);
+    }
 }

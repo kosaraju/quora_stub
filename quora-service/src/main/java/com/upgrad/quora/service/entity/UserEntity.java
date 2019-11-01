@@ -11,7 +11,7 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "users", schema = "postgres")
+@Table(name = "users", schema = "public")
 @NamedQueries({
         @NamedQuery(name = "userByEmail", query = "select u from UserEntity u where u.email = :email"),
         @NamedQuery(name = "userByUsername", query = "select u from UserEntity u where u.username = :username"),

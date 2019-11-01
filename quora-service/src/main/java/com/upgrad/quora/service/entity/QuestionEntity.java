@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "question", schema = "postgres")
+@Table(name = "question", schema = "public")
 @NamedQueries({
         @NamedQuery(name = "QuestionEntityByUuid", query = "select i from QuestionEntity i where i.uuid = :uuid"),
         @NamedQuery(name = "QuestionEntityByid", query = "select i from QuestionEntity i where i.id = :id"),
