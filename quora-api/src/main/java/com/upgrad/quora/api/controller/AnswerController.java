@@ -105,7 +105,7 @@ public class AnswerController {
         UserAuthEntity userAuthEntity= authenticationService.validateBearerAuthentication(accessToken, "to delete the answer");
         String answerEntity = answerService.deleteAnswer(answerId,accessToken);
         AnswerDeleteResponse answerDeleteResponse = new AnswerDeleteResponse().id(answerEntity).status("ANSWER DELETED");
-        return new ResponseEntity<AnswerDeleteResponse>(answerDeleteResponse, HttpStatus.OK);
+        return new ResponseEntity<AnswerDeleteResponse>(answerDeleteResponse, HttpStatus.OK); // return
     }
 
 
