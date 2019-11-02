@@ -62,4 +62,9 @@ public class QuestionDao {
         return entityManager.createQuery("SELECT a FROM QuestionEntity a", QuestionEntity.class).getResultList();
     }
 
+    public QuestionEntity deleteQuestion(final QuestionEntity questionEntity){
+        entityManager.remove(questionEntity);
+        return questionEntity;
+    }
+
 }

@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.upgrad.quora.api.model.QuestionDeleteResponse;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -121,5 +122,14 @@ public class QuestionController {
 
         return new ResponseEntity<List<QuestionDetailsResponse>>(ent, HttpStatus.OK);
 
+    }
+        @RequestMapping(method = RequestMethod.DELETE, path="/question/delete/{questionId}",produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+        public ResponseEntity<QuestionDeleteResponse>deleteQuestion(@RequestHeader("authorization") final String authorization,@PathVariable("questionId") final String questionId) throws AuthenticationFailedException, AuthorizationFailedException, InvalidQuestionException {
+        String accessToken = authenticationService.getBearerAccessToken(authorization);
+        UserAuthEntity userAuthEntity = authenticationService.validateBearerAuthentication(accessToken, "to delete the answer");
+        UserEntity user = userAuthEntity.getUser();
+        QuestionEntity questionEntity = questionService.deleteQuestion(user.getId(), questionId);
+        QuestionDeleteResponse deleteResponse = new QuestionDeleteResponse().id(questionEntity.getUuid()).status("QUESTION DELETED");
+        return new ResponseEntity<QuestionDeleteResponse>(deleteResponse,HttpStatus.OK);
     }
 }

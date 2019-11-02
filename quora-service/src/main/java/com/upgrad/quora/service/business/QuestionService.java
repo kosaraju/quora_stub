@@ -78,4 +78,17 @@ public class QuestionService {
         }
         return questionDao.findAll();
     }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public QuestionEntity deleteQuestion(long userId, String questionUUID) throws AuthorizationFailedException, InvalidQuestionException{
+        QuestionEntity questionEntity = questionDao.getQuestion(questionUUID);
+        if (questionEntity == null) {
+            throw new InvalidQuestionException("QUES-001", "Entered question uuid does not exist");
+        }
+        if (userId != questionEntity.getUser().getId()) {
+            throw new AuthorizationFailedException("ATHR-003", "Only the question owner or admin can delete the question");
+        }
+
+        return questionDao.deleteQuestion(questionEntity);
+    }
 }
