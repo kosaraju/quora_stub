@@ -1,6 +1,10 @@
 package com.upgrad.quora.api.controller;
 
-import com.upgrad.quora.api.model.*;
+import com.upgrad.quora.api.model.QuestionResponse;
+import com.upgrad.quora.api.model.QuestionRequest;
+import com.upgrad.quora.api.model.QuestionEditRequest;
+import com.upgrad.quora.api.model.QuestionEditResponse;
+import com.upgrad.quora.api.model.QuestionDetailsResponse;
 import com.upgrad.quora.service.business.AuthenticationService;
 import com.upgrad.quora.service.business.QuestionService;
 import com.upgrad.quora.service.entity.QuestionEntity;
@@ -9,6 +13,7 @@ import com.upgrad.quora.service.entity.UserEntity;
 import com.upgrad.quora.service.exception.AuthenticationFailedException;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
 import com.upgrad.quora.service.exception.InvalidQuestionException;
+import com.upgrad.quora.service.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -52,14 +57,14 @@ public class QuestionController {
         //Invoke business service to create question. If same question already exists, throw DuplicateQuestion related Exception message
         questionService.createQuestion(questionEntity);
         QuestionResponse questionResponse = new QuestionResponse().id(questionEntity.getUuid()).status("QUESTION CREATED");
-        return new ResponseEntity<QuestionResponse>(questionResponse,HttpStatus.OK);
+        return new ResponseEntity<QuestionResponse>(questionResponse, HttpStatus.OK);
     }
 
     /*
     Handler to edit the content of the question
      */
     @RequestMapping(method = RequestMethod.PUT, path = "/question/edit/{questionId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<QuestionEditResponse> editQuestion(@RequestHeader("authorization") final String authorization, @PathVariable("questionId") final String questionId, final QuestionEditRequest questionEditRequest) throws AuthorizationFailedException, InvalidQuestionException,AuthenticationFailedException {
+    public ResponseEntity<QuestionEditResponse> editQuestion(@RequestHeader("authorization") final String authorization, @PathVariable("questionId") final String questionId, final QuestionEditRequest questionEditRequest) throws AuthorizationFailedException, InvalidQuestionException, AuthenticationFailedException {
 
         //Get bearer access token
         String accessToken = authenticationService.getBearerAccessToken(authorization);
@@ -69,9 +74,9 @@ public class QuestionController {
         UserEntity user = userAuthEntity.getUser();
 
         //Invoke business Service to edit the question
-        QuestionEntity questionEntity = questionService.editQuestion(questionEditRequest.getContent(), user.getId(),  questionId);
+        QuestionEntity questionEntity = questionService.editQuestion(questionEditRequest.getContent(), user.getId(), questionId);
         QuestionEditResponse questionEditResponse = new QuestionEditResponse().id(questionEntity.getUuid()).status("QUESTION EDITED");
-        return new ResponseEntity<QuestionEditResponse>(questionEditResponse,HttpStatus.OK);
+        return new ResponseEntity<QuestionEditResponse>(questionEditResponse, HttpStatus.OK);
     }
 
     /*
@@ -98,5 +103,23 @@ public class QuestionController {
 
         return new ResponseEntity<List<QuestionDetailsResponse>>(entities, HttpStatus.OK);
     }
-}
 
+    //To get all questions by a user
+    @RequestMapping(method = RequestMethod.GET, path = "/question/all/{userId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<List<QuestionDetailsResponse>> getAllQuestionsByUser(@RequestHeader("authorization") final String authorization, @PathVariable("userId") final String userId) throws AuthenticationFailedException, AuthorizationFailedException, UserNotFoundException {
+        String accessToken = authenticationService.getBearerAccessToken(authorization);
+        UserAuthEntity userAuthEntity = authenticationService.validateBearerAuthentication(accessToken, "to get all questions by user");
+        UserEntity user = userAuthEntity.getUser();
+        List<QuestionEntity> questionEntityList = questionService.getAllQuestionsByUser(userId);
+        List<QuestionDetailsResponse> ent = new ArrayList<QuestionDetailsResponse>();
+        for (QuestionEntity n : questionEntityList) {
+            QuestionDetailsResponse questionDetailsResponse = new QuestionDetailsResponse();
+            questionDetailsResponse.id(n.getUuid());
+            questionDetailsResponse.content(n.getContent());
+            ent.add(questionDetailsResponse);
+        }
+
+        return new ResponseEntity<List<QuestionDetailsResponse>>(ent, HttpStatus.OK);
+
+    }
+}

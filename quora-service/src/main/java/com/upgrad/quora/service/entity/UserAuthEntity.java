@@ -12,7 +12,7 @@ import java.io.Serializable;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "user_auth", schema = "public")
+@Table(name = "user_auth", schema = "postgres")
 @NamedQueries({
         @NamedQuery(name = "userAuthTokenByAccessToken", query = "select ut from UserAuthEntity ut where ut.accessToken =:accessToken")
 })

@@ -1,5 +1,5 @@
 package com.upgrad.quora.api.controller;
-import com.upgrad.quora.api.model.*;
+import com.upgrad.quora.api.model.AnswerDeleteResponse;
 import com.upgrad.quora.api.model.AnswerEditRequest;
 import com.upgrad.quora.api.model.AnswerEditResponse;
 import com.upgrad.quora.api.model.AnswerRequest;
@@ -64,50 +64,34 @@ public class AnswerController {
     }
 
     //PUT Request
-    @RequestMapping(method = RequestMethod.PUT,
-            path = "/answer/edit/{answerId}",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<AnswerEditResponse>
-    editAnswer(@RequestHeader("authorization") final String authorization,
-               @PathVariable("answerId") final String answerId,
-               final AnswerEditRequest answerEditRequest
-    ) throws AuthorizationFailedException,
-            InvalidQuestionException,
-            AuthenticationFailedException, AnswerNotFoundException {
-
-        String accessToken =
-                authenticationService.getBearerAccessToken(authorization);
+    @RequestMapping(method = RequestMethod.PUT, path = "/answer/edit/{answerId}" ,produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<AnswerEditResponse> editAnswer(@RequestHeader("authorization") final String authorization, @PathVariable("answerId") final String answerId, final AnswerEditRequest answerEditRequest) throws AuthorizationFailedException, InvalidQuestionException, AuthenticationFailedException, AnswerNotFoundException {
+        String accessToken = authenticationService.getBearerAccessToken(authorization);
         //Check if the bearer authentication exists
-        UserAuthEntity userAuthEntity =
-                authenticationService.validateBearerAuthentication(
-                        accessToken,
-                        "to edit the answer"
-                );
+        UserAuthEntity userAuthEntity = authenticationService.validateBearerAuthentication(accessToken, "to edit the answer");
         UserEntity user = userAuthEntity.getUser();
         // Edit question
-        AnswerEntity answerEntity =
-                answerService.editAnswer(
-                        answerEditRequest.getContent(),
-                        user,
-                        answerId
-                );
-        AnswerEditResponse answerEditResponse =
-                new AnswerEditResponse()
-                        .id(answerEntity.getUuid())
-                        .status("ANSWER EDITED");
+        AnswerEntity answerEntity = answerService.editAnswer(answerEditRequest.getContent(), user, answerId);
+        AnswerEditResponse answerEditResponse = new AnswerEditResponse().id(answerEntity.getUuid()).status("ANSWER EDITED");
         return new ResponseEntity<AnswerEditResponse>(answerEditResponse,HttpStatus.OK);
     }
 
-
-    @RequestMapping(method = RequestMethod.DELETE,path="answer/delete/{answerId}",produces = MediaType.APPLICATION_JSON_UTF8_VALUE,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    //Delete Request
+    @RequestMapping(method = RequestMethod.DELETE,path="answer/delete/{answerId}",produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<AnswerDeleteResponse> deleteAnswer(@RequestHeader("authorization") final String authorization,@PathVariable ( "answerId") final String answerId) throws AuthenticationFailedException, AuthorizationFailedException, AnswerNotFoundException {
         String accessToken = authenticationService.getBearerAccessToken(authorization);
+        //Check if the bearer authentication exists
         UserAuthEntity userAuthEntity= authenticationService.validateBearerAuthentication(accessToken, "to delete the answer");
-        String answerEntity = answerService.deleteAnswer(answerId,accessToken);
-        AnswerDeleteResponse answerDeleteResponse = new AnswerDeleteResponse().id(answerEntity).status("ANSWER DELETED");
-        return new ResponseEntity<AnswerDeleteResponse>(answerDeleteResponse, HttpStatus.OK); // return
+        UserEntity user = userAuthEntity.getUser();
+        //Delete Answer
+        AnswerEntity answerEntity = answerService.deleteAnswer(answerId,user);
+        AnswerDeleteResponse answerDeleteResponse = new AnswerDeleteResponse().id(answerEntity.getUuid()).status("ANSWER DELETED");
+        return new ResponseEntity<AnswerDeleteResponse>(answerDeleteResponse, HttpStatus.OK); // Return status
     }
 
 
 }
+
+
+
 
