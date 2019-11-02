@@ -1,9 +1,12 @@
 package com.upgrad.quora.service.business;
 
 import com.upgrad.quora.service.dao.QuestionDao;
+import com.upgrad.quora.service.dao.UserDao;
 import com.upgrad.quora.service.entity.QuestionEntity;
+import com.upgrad.quora.service.entity.UserEntity;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
 import com.upgrad.quora.service.exception.InvalidQuestionException;
+import com.upgrad.quora.service.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -15,6 +18,9 @@ import java.util.List;
 public class QuestionService {
     @Autowired
     private QuestionDao questionDao;
+
+    @Autowired
+    private UserDao userDao;
 
     @Autowired
     private PasswordCryptographyProvider passwordCryptographyProvider;
@@ -50,7 +56,6 @@ public class QuestionService {
         return questionDao.getQuestion(questionUUID);
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
     public List<QuestionEntity> getAllQuestions() {
         return questionDao.findAll();
     }
@@ -64,4 +69,24 @@ public class QuestionService {
         return questionEntity;
     }
 
+    public List<QuestionEntity> getAllQuestionsByUser(String uuid) throws UserNotFoundException {
+        UserEntity user = userDao.getUserByUUID(uuid);
+        if (user == null) {
+            throw new UserNotFoundException("USR-001", "User with entered uuid whose question details are to be seen does not exist");
+        }
+        return questionDao.findAllByUser(user);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public QuestionEntity deleteQuestion(UserEntity user, String questionUUID) throws AuthorizationFailedException, InvalidQuestionException {
+        QuestionEntity questionEntity = questionDao.getQuestion(questionUUID);
+        if (questionEntity == null) {
+            throw new InvalidQuestionException("QUES-001", "Entered question uuid does not exist");
+        }
+
+        if (!user.getUuid().equals(questionEntity.getUser().getUuid()) && !user.getRole().equalsIgnoreCase("admin")) {
+            throw new AuthorizationFailedException("ATHR-003", "Only the question owner or admin can delete the question");
+        }
+        return questionDao.deleteQuestion(questionEntity);
+    }
 }

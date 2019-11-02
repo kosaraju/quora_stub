@@ -2,6 +2,7 @@ package com.upgrad.quora.service.dao;
 
 import com.upgrad.quora.service.entity.QuestionEntity;
 import com.upgrad.quora.service.entity.UserAuthEntity;
+import com.upgrad.quora.service.entity.UserEntity;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -60,6 +61,16 @@ public class QuestionDao {
 
     public List<QuestionEntity> findAll() {
         return entityManager.createQuery("SELECT a FROM QuestionEntity a", QuestionEntity.class).getResultList();
+    }
+
+
+    public List<QuestionEntity> findAllByUser(UserEntity user) {
+        return entityManager.createNamedQuery("QuestionEntitiesByUser", QuestionEntity.class).setParameter("user", user).getResultList();
+    }
+
+    public QuestionEntity deleteQuestion(final QuestionEntity questionEntity) {
+        entityManager.remove(questionEntity);
+        return questionEntity;
     }
 
 }
