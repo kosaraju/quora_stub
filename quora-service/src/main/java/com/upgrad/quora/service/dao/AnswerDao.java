@@ -2,70 +2,74 @@ package com.upgrad.quora.service.dao;
 
 import com.upgrad.quora.service.entity.AnswerEntity;
 import com.upgrad.quora.service.entity.QuestionEntity;
-import com.upgrad.quora.service.entity.UserAuthEntity;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.stereotype.Repository;
-
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-import java.util.List;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.stereotype.Repository;
 
 @SuppressWarnings("JpaQueryApiInspection")
 @Repository
 public class AnswerDao {
 
-    @PersistenceContext
-    private EntityManager entityManager;
+  @PersistenceContext
+  private EntityManager entityManager;
 
-    public AnswerEntity createAnswer(AnswerEntity answerEntity) {
-        entityManager.persist(answerEntity);
-        return answerEntity;
-    }
+  /** create an answer.
+   * @param answerEntity AnswerEntity
+   * @return AnswerEntity
+   */
+  public AnswerEntity createAnswer(AnswerEntity answerEntity) {
+    entityManager.persist(answerEntity);
+    return answerEntity;
+  }
 
-    public UserAuthEntity getUserAuthToken(final String accesstoken) {
-        try {
-            return entityManager.createNamedQuery("userAuthTokenByAccessToken", UserAuthEntity.class).setParameter("accessToken", accesstoken).getSingleResult();
-        } catch (NoResultException nre) {
-            return null;
-        }
-    }
 
-    public AnswerEntity getAnswer(final String answerUUID) {
-        try {
-            return entityManager.createNamedQuery("AnswerEntityByUuid", AnswerEntity.class).setParameter("uuid", answerUUID).getSingleResult();
-        } catch (NoResultException nre) {
-            return null;
-        }
+  /** get answer by uuid.
+   * @param answeruuid answer uuid
+   * @return AnswerEntity
+   */
+  public AnswerEntity getAnswer(final String answeruuid) {
+    try {
+      return entityManager.createNamedQuery("AnswerEntityByUuid", AnswerEntity.class)
+          .setParameter("uuid", answeruuid).getSingleResult();
+    } catch (NoResultException nre) {
+      return null;
     }
+  }
 
-    public AnswerEntity getAnswerById(final long Id) {
-        try {
-            return entityManager.createNamedQuery("AnswerEntityByid", AnswerEntity.class).setParameter("id", Id).getSingleResult();
-        } catch (NoResultException nre) {
-            return null;
-        }
-    }
+  /**Update an answer.
+   * @param answerEntity  answerEntity
+   * @return answerEntity
+   */
+  public AnswerEntity updateAnswer(final AnswerEntity answerEntity) {
+    return entityManager.merge(answerEntity);
+  }
 
-    public AnswerEntity updateAnswer(final AnswerEntity answerEntity) {
-        return entityManager.merge(answerEntity);
-    }
+  /**get all answers for a given question.
+   * @param questionEntity questionEntity
+   * @return list of answerEntity
+   */
+  public List<AnswerEntity> answerEntityByQuestionEntity(final QuestionEntity questionEntity) {
+    return entityManager
+        .createNamedQuery(
+            "AnswerEntityByQuestionEntity",
+            AnswerEntity.class)
+        .setParameter(
+            "questionEntity",
+            questionEntity)
+        .getResultList();
+  }
 
-    public List<AnswerEntity> AnswerEntityByQuestionEntity(final QuestionEntity questionEntity) {
-        return entityManager
-                .createNamedQuery(
-                        "AnswerEntityByQuestionEntity",
-                        AnswerEntity.class)
-                .setParameter(
-                        "questionEntity",
-                        questionEntity)
-                .getResultList();
-    }
-
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    public AnswerEntity deleteAnswer(final AnswerEntity answerEntity) {
-        entityManager.remove(answerEntity);
-        return answerEntity;
-    }
+  /** Delete an answer.
+   * @param answerEntity answerEntity
+   * @return answerEntity
+   */
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  public AnswerEntity deleteAnswer(final AnswerEntity answerEntity) {
+    entityManager.remove(answerEntity);
+    return answerEntity;
+  }
 }
