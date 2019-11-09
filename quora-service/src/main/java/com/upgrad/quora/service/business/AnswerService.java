@@ -36,7 +36,7 @@ public class AnswerService {
   }
 
   /**
-   * edit Answer
+   * edit Answer.
    *
    * @param content    answer
    * @param user       user uuid
@@ -70,13 +70,13 @@ public class AnswerService {
     return answerDao.updateAnswer(answerEntity);
   }
 
-  /**
-   * @param questionUUID
-   * @return
-   * @throws InvalidQuestionException
+  /**get question by uuid.
+   * @param questionuuid questionuuid
+   * @return questionEntity
+   * @throws InvalidQuestionException InvalidQuestionException
    */
-  public QuestionEntity getQuestionById(String questionUUID) throws InvalidQuestionException {
-    QuestionEntity questionEntity = questionDao.getQuestion(questionUUID);
+  public QuestionEntity getQuestionById(String questionuuid) throws InvalidQuestionException {
+    QuestionEntity questionEntity = questionDao.getQuestion(questionuuid);
     if (questionEntity == null) {
       throw new InvalidQuestionException("QUES-001",
           "The question with entered uuid whose details are to be seen does not exist");
@@ -84,28 +84,28 @@ public class AnswerService {
     return questionEntity;
   }
 
-  /**
-   * @param questionEntity
-   * @return
+  /**get list of all answers to question.
+   * @param questionEntity questionEntity
+   * @return List of AnswerEntity
    */
   public List<AnswerEntity> getAllAnswersToQuestion(QuestionEntity questionEntity) {
     List<AnswerEntity> answerEntitieList = new ArrayList<>();
-    answerEntitieList = answerDao.AnswerEntityByQuestionEntity(questionEntity);
+    answerEntitieList = answerDao.answerEntityByQuestionEntity(questionEntity);
 
     return answerEntitieList;
   }
 
-  /**
-   * @param userId
-   * @param answerUUID
-   * @return
-   * @throws AnswerNotFoundException
-   * @throws AuthorizationFailedException
+  /**delete an answer.
+   * @param userId user uuid
+   * @param answeruuid answer uuid
+   * @return answerEntity
+   * @throws AnswerNotFoundException AnswerNotFoundException
+   * @throws AuthorizationFailedException AuthorizationFailedException
    */
   @Transactional(propagation = Propagation.REQUIRED)
-  public AnswerEntity deleteAnswer(String userId, String answerUUID)
+  public AnswerEntity deleteAnswer(String userId, String answeruuid)
       throws AnswerNotFoundException, AuthorizationFailedException {
-    AnswerEntity answerEntity = answerDao.getAnswer(answerUUID);
+    AnswerEntity answerEntity = answerDao.getAnswer(answeruuid);
     if (answerEntity == null) {
       throw new AnswerNotFoundException("ANS-001", "Entered answer uuid does not exist");
     }

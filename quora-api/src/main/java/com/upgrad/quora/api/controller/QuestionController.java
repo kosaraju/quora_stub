@@ -108,7 +108,7 @@ public class QuestionController {
 
     //Invoke business Service to edit the question
     QuestionEntity questionEntity = questionService
-        .editQuestion(questionEditRequest.getContent(), user.getId(), questionId);
+        .editQuestion(questionEditRequest.getContent(), user.getUuid(), questionId);
     QuestionEditResponse questionEditResponse = new QuestionEditResponse()
         .id(questionEntity.getUuid()).status("QUESTION EDITED");
     return new ResponseEntity<QuestionEditResponse>(questionEditResponse, HttpStatus.OK);

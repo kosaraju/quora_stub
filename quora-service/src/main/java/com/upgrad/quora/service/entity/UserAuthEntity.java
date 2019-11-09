@@ -22,7 +22,8 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 @Entity
 @Table(name = "user_auth", schema = "postgres")
 @NamedQueries({
-    @NamedQuery(name = "userAuthTokenByAccessToken", query = "select ut from UserAuthEntity ut where ut.accessToken =:accessToken")
+    @NamedQuery(name = "userAuthTokenByAccessToken",
+        query = "select ut from UserAuthEntity ut where ut.accessToken =:accessToken")
 })
 public class UserAuthEntity implements Serializable {
 

@@ -20,21 +20,20 @@ public class UserService {
   @Autowired
   private PasswordCryptographyProvider passwordCryptographyProvider;
 
-  /**
-   * @param userEntity
-   * @return
-   * @throws SignUpRestrictedException
+  /**signup business service.
+   * @param userEntity user entity
+   * @return UserEntity
+   * @throws SignUpRestrictedException SignUpRestrictedException
    */
   @Transactional(propagation = Propagation.REQUIRED)
   public UserEntity signup(UserEntity userEntity) throws SignUpRestrictedException {
 
     //Perform null check for mandatory fields
     if (userEntity == null || userEntity.getFirstName() == null || userEntity.getLastName() == null
-        ||
-        userEntity.getUsername() == null || userEntity.getEmail() == null
-        || userEntity.getPassword() == null ||
-        userEntity.getFirstName().isEmpty() || userEntity.getLastName().isEmpty() ||
-        userEntity.getEmail().isEmpty() || userEntity.getPassword().isEmpty() || userEntity
+        || userEntity.getUsername() == null || userEntity.getEmail() == null
+        || userEntity.getPassword() == null
+        || userEntity.getFirstName().isEmpty() || userEntity.getLastName().isEmpty()
+        || userEntity.getEmail().isEmpty() || userEntity.getPassword().isEmpty() || userEntity
         .getUsername().isEmpty()
     ) {
       throw new SignUpRestrictedException("USE-001", "No input provided for required fields");
@@ -45,7 +44,8 @@ public class UserService {
     UserEntity existingUser2 = userDao.getUserByUsername(userEntity.getUsername());
 
     if (existingUser1 != null && existingUser2 != null) {
-      throw new SignUpRestrictedException("USE-002", "Username & Email id already exists");
+      throw new SignUpRestrictedException("USE-002",
+          "Users with same username & email id already exists");
     } else if (existingUser2 != null) {
       throw new SignUpRestrictedException("SGR-001",
           "Try any other Username, this Username has already been taken");
@@ -61,26 +61,26 @@ public class UserService {
     return userDao.createUser(userEntity);
   }
 
-  /**
-   * @param uuid
-   * @return
-   * @throws UserNotFoundException
+  /**Get user profile business service.
+   * @param uuid User uuid
+   * @return UserEntity
+   * @throws UserNotFoundException UserNotFoundException
    */
   @Transactional(propagation = Propagation.REQUIRED)
   public UserEntity getUserProfile(String uuid) throws UserNotFoundException {
-    UserEntity userEntity = userDao.getUserByUUID(uuid);
+    UserEntity userEntity = userDao.getuserbyuuid(uuid);
     if (userEntity == null) {
       throw new UserNotFoundException("USR-001", "User with entered uuid does not exist");
     }
     return userEntity;
   }
 
-  /**
-   * @param uuid
-   * @param userAuthEntity
-   * @return
-   * @throws UserNotFoundException
-   * @throws AuthorizationFailedException
+  /**Delete a user.
+   * @param uuid user uuid
+   * @param userAuthEntity User Auth Entity
+   * @return UserEntity
+   * @throws UserNotFoundException UserNotFoundException
+   * @throws AuthorizationFailedException AuthorizationFailedException
    */
   @Transactional(propagation = Propagation.REQUIRED)
   public UserEntity deleteUser(String uuid, UserAuthEntity userAuthEntity)

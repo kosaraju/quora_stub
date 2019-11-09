@@ -16,18 +16,18 @@ public class UserDao {
   @PersistenceContext
   private EntityManager entityManager;
 
-  /**
-   * @param userEntity
-   * @return
+  /**create a user.
+   * @param userEntity userEntity
+   * @return userEntity
    */
   public UserEntity createUser(UserEntity userEntity) {
     entityManager.persist(userEntity);
     return userEntity;
   }
 
-  /**
-   * @param userEntity
-   * @return
+  /**Delete auser.
+   * @param userEntity userEntity
+   * @return userEntity
    */
   @OnDelete(action = OnDeleteAction.CASCADE)
   public UserEntity deleteUser(UserEntity userEntity) {
@@ -35,9 +35,9 @@ public class UserDao {
     return userEntity;
   }
 
-  /**
-   * @param email
-   * @return
+  /**Get User by email.
+   * @param email email
+   * @return userEntity
    */
   public UserEntity getUserByEmail(final String email) {
     try {
@@ -48,11 +48,11 @@ public class UserDao {
     }
   }
 
-  /**
-   * @param uuid
-   * @return
+  /**Get user by uuid.
+   * @param uuid uuid
+   * @return userEntity
    */
-  public UserEntity getUserByUUID(final String uuid) {
+  public UserEntity getuserbyuuid(final String uuid) {
     try {
       return entityManager.createNamedQuery("userByUUID", UserEntity.class)
           .setParameter("uuid", uuid).getSingleResult();
@@ -61,9 +61,9 @@ public class UserDao {
     }
   }
 
-  /**
-   * @param username
-   * @return
+  /**Get user by User name.
+   * @param username username
+   * @return userEntity
    */
   public UserEntity getUserByUsername(final String username) {
     try {
@@ -74,18 +74,18 @@ public class UserDao {
     }
   }
 
-  /**
-   * @param userAuthEntity
-   * @return
+  /**create authentication access token.
+   * @param userAuthEntity userAuthEntity
+   * @return userAuthEntity
    */
   public UserAuthEntity createAuthToken(final UserAuthEntity userAuthEntity) {
     entityManager.persist(userAuthEntity);
     return userAuthEntity;
   }
 
-  /**
-   * @param accessToken
-   * @return
+  /**Get user by access token.
+   * @param accessToken accessToken
+   * @return userAuthEntity
    */
   public UserAuthEntity getUserByToken(final String accessToken) {
     try {
@@ -96,15 +96,15 @@ public class UserDao {
     }
   }
 
-  /**
-   * @param updatedUserEntity
+  /**update User.
+   * @param updatedUserEntity userEntity
    */
   public void updateUser(final UserEntity updatedUserEntity) {
     entityManager.merge(updatedUserEntity);
   }
 
-  /**
-   * @param updatedUserAuthEntity
+  /**update UserAuthEntity.
+   * @param updatedUserAuthEntity userAuthEntity
    */
   public void updateUserAuthEntity(final UserAuthEntity updatedUserAuthEntity) {
     entityManager.merge(updatedUserAuthEntity);

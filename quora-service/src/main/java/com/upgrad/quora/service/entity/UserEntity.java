@@ -20,7 +20,8 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 @Table(name = "users", schema = "postgres")
 @NamedQueries({
     @NamedQuery(name = "userByEmail", query = "select u from UserEntity u where u.email = :email"),
-    @NamedQuery(name = "userByUsername", query = "select u from UserEntity u where u.username = :username"),
+    @NamedQuery(name = "userByUsername",
+        query = "select u from UserEntity u where u.username = :username"),
     @NamedQuery(name = "userByUUID", query = "select u from UserEntity u where u.uuid = :uuid")
 
 })

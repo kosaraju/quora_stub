@@ -1,6 +1,5 @@
 package com.upgrad.quora.api.config;
 
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.PathSelectors;
@@ -16,6 +15,9 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 public class SwaggerConfiguration {
 
+  /**
+   * @return
+   */
   @Bean
   public Docket swagger() {
     return new Docket(DocumentationType.SWAGGER_2).select()

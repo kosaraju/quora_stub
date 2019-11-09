@@ -1,6 +1,5 @@
 package com.upgrad.quora.service.business;
 
-
 import com.upgrad.quora.service.dao.UserDao;
 import com.upgrad.quora.service.entity.UserAuthEntity;
 import com.upgrad.quora.service.entity.UserEntity;
@@ -20,13 +19,13 @@ public class AuthenticationService {
   private UserDao userDao;
 
   @Autowired
-  private PasswordCryptographyProvider CryptographyProvider;
+  private PasswordCryptographyProvider passwordCryptographyProvider;
 
-  /**
-   * @param username
-   * @param password
-   * @return
-   * @throws AuthenticationFailedException
+  /** authenticate incoming login.
+   * @param username username
+   * @param password password
+   * @return UserAuthEntity
+   * @throws AuthenticationFailedException AuthenticationFailedException
    */
   @Transactional(propagation = Propagation.REQUIRED)
   public UserAuthEntity authenticate(final String username, final String password)
@@ -62,10 +61,10 @@ public class AuthenticationService {
     }
   }
 
-  /**
-   * @param acessToken
-   * @return
-   * @throws SignOutRestrictedException
+  /**Logoff session.
+   * @param acessToken access token
+   * @return UserAuthEntity
+   * @throws SignOutRestrictedException SignOutRestrictedException
    */
   @Transactional(propagation = Propagation.REQUIRED)
   public UserAuthEntity logoff(final String acessToken) throws SignOutRestrictedException {
@@ -80,15 +79,11 @@ public class AuthenticationService {
     return userAuthEntity;
   }
 
-  /*
-  Service to validate Bearer authorization token
-   */
-
-  /**
-   * @param accessToken
-   * @param context
-   * @return
-   * @throws AuthorizationFailedException
+  /**Service to validate Bearer authorization token.
+   * @param accessToken accessToken
+   * @param context conetxt for reusability
+   * @return UserAuthEntity
+   * @throws AuthorizationFailedException AuthorizationFailedException
    */
   @Transactional(propagation = Propagation.REQUIRED)
   public UserAuthEntity validateBearerAuthentication(final String accessToken, final String context)
@@ -104,14 +99,10 @@ public class AuthenticationService {
     return userAuthEntity;
   }
 
-  /*
-  Service to split authorization header to get Beare access token
-   */
-
-  /**
-   * @param authorization
-   * @return
-   * @throws AuthenticationFailedException
+  /** Service to split authorization header to get Beare access token.
+   * @param authorization authorization
+   * @return beare access token
+   * @throws AuthenticationFailedException AuthenticationFailedException
    */
   public String getBearerAccessToken(final String authorization)
       throws AuthenticationFailedException {
@@ -123,7 +114,8 @@ public class AuthenticationService {
       accessToken = tokens[1];
     } catch (IndexOutOfBoundsException ie) {
       //If the request doesn't adheres to 'Bearer accessToken', try to read token in index 0
-      accessToken = tokens[0]; //for scenarios where those users don't adhere to adding prefix of Bearer like test cases
+      accessToken = tokens[0];
+      //for scenarios where those users don't adhere to adding prefix of Bearer like test cases
       if (accessToken == null) {
         throw new AuthenticationFailedException("ATH-005", "Use format: 'Bearer accessToken'");
       }

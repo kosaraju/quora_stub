@@ -22,13 +22,10 @@ public class QuestionService {
   @Autowired
   private UserDao userDao;
 
-  @Autowired
-  private PasswordCryptographyProvider passwordCryptographyProvider;
-
-  /**
-   * @param questionEntity
-   * @return
-   * @throws InvalidQuestionException
+  /**create a question.
+   * @param questionEntity questionEntity
+   * @return questionEntity
+   * @throws InvalidQuestionException InvalidQuestionException
    */
   @Transactional(propagation = Propagation.REQUIRED)
   public QuestionEntity createQuestion(QuestionEntity questionEntity)
@@ -46,22 +43,22 @@ public class QuestionService {
     return questionDao.createQuestion(questionEntity);
   }
 
-  /**
-   * @param content
-   * @param userId
-   * @param questionUUID
-   * @return
-   * @throws AuthorizationFailedException
-   * @throws InvalidQuestionException
+  /**edit a question.
+   * @param content question content
+   * @param userUuid user uuid
+   * @param questionuuid question uuid
+   * @return QuestionEntity
+   * @throws AuthorizationFailedException AuthorizationFailedException
+   * @throws InvalidQuestionException InvalidQuestionException
    */
   @Transactional(propagation = Propagation.REQUIRED)
-  public QuestionEntity editQuestion(String content, long userId, String questionUUID)
+  public QuestionEntity editQuestion(String content, String userUuid, String questionuuid)
       throws AuthorizationFailedException, InvalidQuestionException {
-    QuestionEntity questionEntity = questionDao.getQuestion(questionUUID);
+    QuestionEntity questionEntity = questionDao.getQuestion(questionuuid);
     if (questionEntity == null) {
       throw new InvalidQuestionException("QUES-001", "Entered question uuid does not exist");
     }
-    if (userId != questionEntity.getUser().getId()) {
+    if (userUuid != null && !userUuid.equals(questionEntity.getUser().getUuid())) {
       throw new AuthorizationFailedException("ATHR-003",
           "Only the question owner can edit the question");
     }
@@ -72,33 +69,33 @@ public class QuestionService {
     }
     questionEntity.setContent(content);
     questionDao.updateQuestion(questionEntity);
-    return questionDao.getQuestion(questionUUID);
+    return questionDao.getQuestion(questionuuid);
   }
 
   public List<QuestionEntity> getAllQuestions() {
     return questionDao.findAll();
   }
 
-  /**
-   * @param questionUUID
-   * @return
-   * @throws InvalidQuestionException
+  /**get question by uuid.
+   * @param questionuuid questionuuid
+   * @return QuestionEntity
+   * @throws InvalidQuestionException InvalidQuestionException
    */
-  public QuestionEntity getQuestionById(String questionUUID) throws InvalidQuestionException {
-    QuestionEntity questionEntity = questionDao.getQuestion(questionUUID);
+  public QuestionEntity getQuestionById(String questionuuid) throws InvalidQuestionException {
+    QuestionEntity questionEntity = questionDao.getQuestion(questionuuid);
     if (questionEntity == null) {
       throw new InvalidQuestionException("QUES-001", "The question entered is invalid");
     }
     return questionEntity;
   }
 
-  /**
-   * @param uuid
-   * @return
-   * @throws UserNotFoundException
+  /**get all questions by user.
+   * @param uuid user uuid
+   * @return List of all QuestionEntity
+   * @throws UserNotFoundException UserNotFoundException
    */
   public List<QuestionEntity> getAllQuestionsByUser(String uuid) throws UserNotFoundException {
-    UserEntity user = userDao.getUserByUUID(uuid);
+    UserEntity user = userDao.getuserbyuuid(uuid);
     if (user == null) {
       throw new UserNotFoundException("USR-001",
           "User with entered uuid whose question details are to be seen does not exist");
@@ -106,17 +103,17 @@ public class QuestionService {
     return questionDao.findAllByUser(user);
   }
 
-  /**
-   * @param user
-   * @param questionUUID
-   * @return
-   * @throws AuthorizationFailedException
-   * @throws InvalidQuestionException
+  /**delete a question.
+   * @param user userEntity
+   * @param questionuuid question uuid
+   * @return QuestionEntity
+   * @throws AuthorizationFailedException AuthorizationFailedException
+   * @throws InvalidQuestionException InvalidQuestionException
    */
   @Transactional(propagation = Propagation.REQUIRED)
-  public QuestionEntity deleteQuestion(UserEntity user, String questionUUID)
+  public QuestionEntity deleteQuestion(UserEntity user, String questionuuid)
       throws AuthorizationFailedException, InvalidQuestionException {
-    QuestionEntity questionEntity = questionDao.getQuestion(questionUUID);
+    QuestionEntity questionEntity = questionDao.getQuestion(questionuuid);
     if (questionEntity == null) {
       throw new InvalidQuestionException("QUES-001", "Entered question uuid does not exist");
     }
